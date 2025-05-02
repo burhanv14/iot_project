@@ -18,7 +18,7 @@ export default function HomePage() {
           Order Now
         </Link>
         <Link
-          href="/success"
+          href="/help"
           className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium px-8 py-3 rounded-full shadow-lg transition-transform transform hover:scale-105"
         >
           How It Works

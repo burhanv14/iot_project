@@ -30,7 +30,6 @@ model Product {
   name        String
   priceCents  Int     // price in cents
   stock       Int
-  orders      OrderItem[]
 }
 
 // Orders (one order per payment)
@@ -41,15 +40,6 @@ model Order {
   status      String   @default("pending") // e.g. pending, paid, completed
   totalCents  Int
   createdAt   DateTime @default(now())
-  items       OrderItem[]
-}
-
-// Junction table for products in an order (for multi-item orders)
-model OrderItem {
-  id        Int     @id @default(autoincrement())
-  order     Order   @relation(fields: [orderId], references: [id])
-  orderId   Int
-  product   Product @relation(fields: [productId], references: [id])
-  productId Int
-  quantity  Int
+  items       String[]
+  qty         Int[] 
 }

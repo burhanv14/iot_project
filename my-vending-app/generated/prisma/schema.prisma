@@ -26,30 +26,20 @@ model User {
 
 // Products for sale
 model Product {
-  id         Int         @id @default(autoincrement())
+  id         Int    @id @default(autoincrement())
   name       String
   priceCents Int // price in cents
   stock      Int
-  orders     OrderItem[]
 }
 
 // Orders (one order per payment)
 model Order {
-  id         Int         @id @default(autoincrement())
-  user       User?       @relation(fields: [userId], references: [id])
+  id         Int      @id @default(autoincrement())
+  user       User?    @relation(fields: [userId], references: [id])
   userId     Int?
-  status     String      @default("pending") // e.g. pending, paid, completed
+  status     String   @default("pending") // e.g. pending, paid, completed
   totalCents Int
-  createdAt  DateTime    @default(now())
-  items      OrderItem[]
-}
-
-// Junction table for products in an order (for multi-item orders)
-model OrderItem {
-  id        Int     @id @default(autoincrement())
-  order     Order   @relation(fields: [orderId], references: [id])
-  orderId   Int
-  product   Product @relation(fields: [productId], references: [id])
-  productId Int
-  quantity  Int
+  createdAt  DateTime @default(now())
+  items      String[]
+  qty        Int[]
 }

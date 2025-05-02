@@ -21,11 +21,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <Link href="/" className="text-gray-600 hover:text-indigo-500 transition-colors">
                 Home
               </Link>
-              <Link href="/checkout" className="text-gray-600 hover:text-indigo-500 transition-colors">
+              <Link href="/placeOrder" className="text-gray-600 hover:text-indigo-500 transition-colors">
                 Order Now
               </Link>
-              <Link href="/success" className="text-gray-600 hover:text-indigo-500 transition-colors">
-                Success
+              <Link href="/current-user" className="bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-4 py-2 rounded-full transition-transform transform hover:scale-105">
+                Login/Signup
               </Link>
             </div>
           </nav>
@@ -37,7 +37,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
         <footer className="bg-gray-100 border-t">
           <div className="container mx-auto p-4 text-center text-sm text-gray-500">
-            © {new Date().getFullYear()} VendiQ IoT Vending — Built with Next.js & ESP32
+            © {new Date().getFullYear()} VendiQ IoT Vending — All rights reserved.
           </div>
         </footer>
       </body>
