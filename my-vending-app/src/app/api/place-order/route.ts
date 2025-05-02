@@ -1,50 +1,71 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 
 export async function POST(request: Request) {
   try {
-    const connectionString = `${process.env.DATABASE_URL}`
     const prisma = new PrismaClient();
     const body = await request.json();
-    const { items, totalCents } = body;
-    
-    // Validate input
-    if (!items || !items.length) {
+    const { items, rfidTag } = body;
+
+    if (!items || !items.length || !rfidTag) {
       return NextResponse.json(
-        { error: 'No items provided' },
+        { error: 'Missing required fields: items or rfidTag' },
         { status: 400 }
       );
     }
-    
+
+    // Fetch the current user based on the RFID tag
+    const user = await prisma.user.findUnique({
+      where: { rfidTag },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'User not found for the provided RFID tag' },
+        { status: 404 }
+      );
+    }
+
+    // Calculate totalCents, items, and qty
+    let totalCents = 0;
+    const productNames: string[] = [];
+    const quantities: number[] = [];
+
+    for (const { productId, quantity } of items) {
+      const product = await prisma.product.findUnique({ where: { id: productId } });
+
+      if (!product || product.stock < quantity) {
+        return NextResponse.json(
+          { error: `Product ${productId} is unavailable or insufficient stock` },
+          { status: 400 }
+        );
+      }
+
+      totalCents += product.priceCents * quantity;
+      productNames.push(product.name);
+      quantities.push(quantity);
+    }
+
     // Create the order
     const order = await prisma.order.create({
       data: {
+        userId: user.rfidTag,
+        user: user.name,
         totalCents,
-        items: {
-          create: items.map((item: any) => ({
-            productId: item.productId,
-            name: item.name,
-            quantity: item.quantity
-          }))
-        }
-      }
+        items: productNames,
+        qty: quantities,
+      },
     });
-    
-    // Optionally update product stock
-    for (const item of items) {
+
+    // Update product stock
+    for (const { productId, quantity } of items) {
       await prisma.product.update({
-        where: { id: item.productId },
-        data: { 
-          stock: { decrement: item.quantity }
-        }
+        where: { id: productId },
+        data: { stock: { decrement: quantity } },
       });
     }
-    
-    return NextResponse.json({ 
-      success: true, 
-      id: order.id 
-    });
-    
+
+    return NextResponse.json({ success: true, id: order.id });
   } catch (error) {
     console.error('Error creating order:', error);
     return NextResponse.json(
