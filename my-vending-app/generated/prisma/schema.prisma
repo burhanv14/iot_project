@@ -21,7 +21,6 @@ model User {
   name    String?
   // If RFID tags are pre-registered:
   rfidTag String? @unique
-  orders  Order[]
 }
 
 // Products for sale
@@ -35,8 +34,7 @@ model Product {
 // Orders (one order per payment)
 model Order {
   id         Int      @id @default(autoincrement())
-  user       User?    @relation(fields: [userId], references: [id])
-  userId     Int?
+  rfidTag    String
   status     String   @default("pending") // e.g. pending, paid, completed
   totalCents Int
   createdAt  DateTime @default(now())

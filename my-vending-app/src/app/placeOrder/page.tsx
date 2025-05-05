@@ -43,7 +43,23 @@ export default function PlaceOrderPage() {
   }, [])
 
   const handleQtyChange = (id: number, val: number) => {
-    setQuantities((q) => ({ ...q, [id]: Math.max(0, val) }))
+    const product = products.find((p) => p.id === id)
+    if (product) {
+      // Ensure quantity doesn't exceed available stock and is not negative
+      const newQty = Math.min(Math.max(0, val), product.stock)
+      setQuantities((q) => ({ ...q, [id]: newQty }))
+
+      // If user tried to enter a value higher than stock, show a message
+      if (val > product.stock) {
+        setMessage(`Maximum available stock for ${product.name} is ${product.stock}`)
+        setMessageType("error")
+        // Auto-dismiss the message after 3 seconds
+        setTimeout(() => {
+          setMessage(null)
+          setMessageType(null)
+        }, 3000)
+      }
+    }
   }
 
   const incrementQuantity = (id: number) => {
@@ -62,30 +78,54 @@ export default function PlaceOrderPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
 
-    const orderItems = products
-      .filter((p) => quantities[p.id] > 0)
-      .map((p) => ({
-        productId: p.id,
-        name: p.name,
-        quantity: quantities[p.id],
-      }))
+    // 1. Validate RFID tag
+    const rfidTag = localStorage.getItem("rfidTag")
+    if (!rfidTag) {
+      setMessage("RFID tag not found. Please scan your card.")
+      setMessageType("error")
+      return
+    }
 
-    const totalCents = products.reduce((sum, p) => sum + p.priceCents * quantities[p.id], 0)
-
-    if (!orderItems.length) {
+    // 2. Validate that at least one product is selected
+    const selectedItems = products.filter((p) => quantities[p.id] > 0)
+    if (selectedItems.length === 0) {
       setMessage("Please select at least one product.")
       setMessageType("error")
       return
     }
 
+    // 3. Validate stock availability for all selected products
+    const stockIssues = selectedItems.filter((p) => quantities[p.id] > p.stock)
+    if (stockIssues.length > 0) {
+      setMessage(
+        `Cannot place order. Some products have insufficient stock: ${stockIssues.map((p) => p.name).join(", ")}`,
+      )
+      setMessageType("error")
+      return
+    }
+
+    // 4. Prepare order items
+    const orderItems = selectedItems.map((p) => ({
+      productId: p.id,
+      quantity: quantities[p.id],
+    }))
+
+    // 5. Calculate total (though the server will recalculate this)
+    const totalCents = products.reduce((sum, p) => sum + p.priceCents * (quantities[p.id] || 0), 0)
+
+    // All validations passed, proceed with API request
     setLoading(true)
     try {
       const res = await fetch("/api/place-order", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          // Include RFID tag in headers as a backup
+          rfidTag: rfidTag,
+        },
         body: JSON.stringify({
           items: orderItems,
-          totalCents,
+          rfidTag,
         }),
       })
 
@@ -94,8 +134,22 @@ export default function PlaceOrderPage() {
       if (res.ok) {
         setMessage(`Order #${data.id} placed successfully! Total amount: ₹${(totalCents / 100).toFixed(2)}`)
         setMessageType("success")
-        // reset form
+
+        // Reset form
         setQuantities(Object.fromEntries(products.map((p) => [p.id, 0])))
+
+        // Optimistically update product stock in the UI
+        setProducts(
+          products.map((product) => {
+            if (quantities[product.id] > 0) {
+              return {
+                ...product,
+                stock: product.stock - quantities[product.id],
+              }
+            }
+            return product
+          }),
+        )
       } else {
         setMessage(data.error || "Something went wrong")
         setMessageType("error")
@@ -157,7 +211,10 @@ export default function PlaceOrderPage() {
               ) : (
                 <div className="space-y-4">
                   {products.map((product) => (
-                    <Card key={product.id} className="overflow-hidden">
+                    <Card
+                      key={product.id}
+                      className={`overflow-hidden ${product.stock === 0 ? "opacity-70 bg-gray-50" : ""}`}
+                    >
                       <CardContent className="p-0">
                         <div className="p-6 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                           <div className="space-y-1">
@@ -171,6 +228,11 @@ export default function PlaceOrderPage() {
                             </div>
                             <p className="text-lg font-semibold text-primary">
                               ₹{(product.priceCents / 100).toFixed(2)}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              Available: {product.stock} {product.stock === 1 ? "unit" : "units"}
+                              {product.stock === 0 && " - Out of stock"}
+                              {product.stock > 0 && product.stock <= 3 && " - Low stock"}
                             </p>
                           </div>
 
@@ -194,6 +256,9 @@ export default function PlaceOrderPage() {
                               className="h-8 w-16 rounded-none text-center [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                               disabled={product.stock === 0}
                             />
+                            {quantities[product.id] > 0 && quantities[product.id] === product.stock && (
+                              <span className="ml-2 text-xs text-amber-600 whitespace-nowrap">Max stock reached</span>
+                            )}
                             <Button
                               variant="outline"
                               size="icon"

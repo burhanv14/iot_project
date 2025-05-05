@@ -136,7 +136,7 @@ exports.Prisma.ProductScalarFieldEnum = {
 
 exports.Prisma.OrderScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
+  rfidTag: 'rfidTag',
   status: 'status',
   totalCents: 'totalCents',
   createdAt: 'createdAt',

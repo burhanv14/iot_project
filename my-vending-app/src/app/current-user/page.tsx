@@ -19,6 +19,7 @@ export default function CurrentUserPage() {
     
     evtSource.onmessage = async (e) => {
       setUid(e.data)
+      localStorage.setItem('rfidTag', e.data); // Store UID in localStorage
       setError(null)
       setLoading(true)
       

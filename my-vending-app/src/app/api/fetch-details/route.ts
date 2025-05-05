@@ -4,7 +4,7 @@ import mqtt from 'mqtt'
 export const runtime = 'nodejs'
 
 // === Configuration ===
-const MQTT_WS_URL = 'ws://192.168.92.183:9001'
+const MQTT_WS_URL = 'ws://172.22.28.218:9001'
 const MQTT_TOPIC  = 'rfid_details'
 
 export async function GET(request: Request) {
