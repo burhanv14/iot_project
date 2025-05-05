@@ -2,31 +2,29 @@ import { NextResponse } from "next/server"
 import { PrismaClient } from "@prisma/client"
 
 // Create a single PrismaClient instance to be reused
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 
-export async function POST(request: Request) {
+export async function POST(request: Request, { params }: { params: { rfidTag: string } }) {
   try {
     const body = await request.json()
-    let { items, rfidTag } = body
+    const { items, rfidNo } = body
+
+    // Use rfidTag from params if not provided in the body
+    const rfidTag = rfidNo || params.rfidTag
+    if (!rfidTag) {
+      return NextResponse.json({ error: "Missing RFID tag" }, { status: 400 })
+    }
 
     // Validate required fields
     if (!items || !items.length) {
       return NextResponse.json({ error: "Missing required fields: items" }, { status: 400 })
     }
 
-    // If rfidTag is not provided in the request body, retrieve it from headers
-    if (!rfidTag) {
-      rfidTag = request.headers.get("rfidTag") || null
-      if (!rfidTag) {
-        return NextResponse.json({ error: "Missing RFID tag" }, { status: 400 })
-      }
-    }
-
     // Use a transaction to ensure data consistency
     const result = await prisma.$transaction(async (tx) => {
       // Fetch the current user based on the RFID tag
       const user = await tx.user.findUnique({
-        where: { rfidTag },
+        where: { rfidTag }, // Use the resolved rfidTag
       })
 
       if (!user) {
@@ -62,16 +60,20 @@ export async function POST(request: Request) {
         quantities.push(item.quantity)
       }
 
-      // Create the order
-      const order = await tx.order.create({
-        data: {
-          rfidTag,
-          totalCents,
-          items: productNames,
-          qty: quantities,
-          status: "pending",
+// Create the order - link to user instead of using rfidNo directly
+    const order = await tx.order.create({
+      data: {
+        user: {
+          connect: {
+            rfidTag
+          }
         },
-      })
+        totalCents,
+        items: productNames,
+        qty: quantities,
+        status: "pending",
+      },
+    })
 
       // Update product stock in bulk
       for (const item of items) {

@@ -136,12 +136,12 @@ exports.Prisma.ProductScalarFieldEnum = {
 
 exports.Prisma.OrderScalarFieldEnum = {
   id: 'id',
-  rfidTag: 'rfidTag',
-  status: 'status',
   totalCents: 'totalCents',
-  createdAt: 'createdAt',
   items: 'items',
-  qty: 'qty'
+  qty: 'qty',
+  status: 'status',
+  createdAt: 'createdAt',
+  userId: 'userId'
 };
 
 exports.Prisma.SortOrder = {

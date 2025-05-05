@@ -1046,6 +1046,36 @@ export namespace Prisma {
    */
 
 
+  /**
+   * Count Type UserCountOutputType
+   */
+
+  export type UserCountOutputType = {
+    orders: number
+  }
+
+  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    orders?: boolean | UserCountOutputTypeCountOrdersArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserCountOutputType
+     */
+    select?: UserCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountOrdersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: OrderWhereInput
+  }
+
 
   /**
    * Models
@@ -1241,6 +1271,8 @@ export namespace Prisma {
     email?: boolean
     name?: boolean
     rfidTag?: boolean
+    orders?: boolean | User$ordersArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1265,10 +1297,18 @@ export namespace Prisma {
   }
 
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "name" | "rfidTag", ExtArgs["result"]["user"]>
+  export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    orders?: boolean | User$ordersArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
-    objects: {}
+    objects: {
+      orders: Prisma.$OrderPayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: number
       email: string
@@ -1668,6 +1708,7 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    orders<T extends User$ordersArgs<ExtArgs> = {}>(args?: Subset<T, User$ordersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$OrderPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1718,6 +1759,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -1736,6 +1781,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -1753,6 +1802,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -1802,6 +1855,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where?: UserWhereInput
@@ -1850,6 +1907,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which Users to fetch.
      */
     where?: UserWhereInput
@@ -1892,6 +1953,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to create a User.
      */
@@ -1940,6 +2005,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to update a User.
      */
@@ -2007,6 +2076,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * The filter to search for the User to update in case it exists.
      */
     where: UserWhereUniqueInput
@@ -2033,6 +2106,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter which User to delete.
      */
     where: UserWhereUniqueInput
@@ -2053,6 +2130,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.orders
+   */
+  export type User$ordersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Order
+     */
+    select?: OrderSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Order
+     */
+    omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    where?: OrderWhereInput
+    orderBy?: OrderOrderByWithRelationInput | OrderOrderByWithRelationInput[]
+    cursor?: OrderWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: OrderScalarFieldEnum | OrderScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2064,6 +2165,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
   }
 
 
@@ -3107,38 +3212,40 @@ export namespace Prisma {
     id: number | null
     totalCents: number | null
     qty: number | null
+    userId: number | null
   }
 
   export type OrderSumAggregateOutputType = {
     id: number | null
     totalCents: number | null
     qty: number[]
+    userId: number | null
   }
 
   export type OrderMinAggregateOutputType = {
     id: number | null
-    rfidTag: string | null
-    status: string | null
     totalCents: number | null
+    status: string | null
     createdAt: Date | null
+    userId: number | null
   }
 
   export type OrderMaxAggregateOutputType = {
     id: number | null
-    rfidTag: string | null
-    status: string | null
     totalCents: number | null
+    status: string | null
     createdAt: Date | null
+    userId: number | null
   }
 
   export type OrderCountAggregateOutputType = {
     id: number
-    rfidTag: number
-    status: number
     totalCents: number
-    createdAt: number
     items: number
     qty: number
+    status: number
+    createdAt: number
+    userId: number
     _all: number
   }
 
@@ -3147,38 +3254,40 @@ export namespace Prisma {
     id?: true
     totalCents?: true
     qty?: true
+    userId?: true
   }
 
   export type OrderSumAggregateInputType = {
     id?: true
     totalCents?: true
     qty?: true
+    userId?: true
   }
 
   export type OrderMinAggregateInputType = {
     id?: true
-    rfidTag?: true
-    status?: true
     totalCents?: true
+    status?: true
     createdAt?: true
+    userId?: true
   }
 
   export type OrderMaxAggregateInputType = {
     id?: true
-    rfidTag?: true
-    status?: true
     totalCents?: true
+    status?: true
     createdAt?: true
+    userId?: true
   }
 
   export type OrderCountAggregateInputType = {
     id?: true
-    rfidTag?: true
-    status?: true
     totalCents?: true
-    createdAt?: true
     items?: true
     qty?: true
+    status?: true
+    createdAt?: true
+    userId?: true
     _all?: true
   }
 
@@ -3270,12 +3379,12 @@ export namespace Prisma {
 
   export type OrderGroupByOutputType = {
     id: number
-    rfidTag: string
-    status: string
     totalCents: number
-    createdAt: Date
     items: string[]
     qty: number[]
+    status: string
+    createdAt: Date
+    userId: number
     _count: OrderCountAggregateOutputType | null
     _avg: OrderAvgAggregateOutputType | null
     _sum: OrderSumAggregateOutputType | null
@@ -3299,57 +3408,71 @@ export namespace Prisma {
 
   export type OrderSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    rfidTag?: boolean
-    status?: boolean
     totalCents?: boolean
-    createdAt?: boolean
     items?: boolean
     qty?: boolean
+    status?: boolean
+    createdAt?: boolean
+    userId?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["order"]>
 
   export type OrderSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    rfidTag?: boolean
-    status?: boolean
     totalCents?: boolean
-    createdAt?: boolean
     items?: boolean
     qty?: boolean
+    status?: boolean
+    createdAt?: boolean
+    userId?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["order"]>
 
   export type OrderSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    rfidTag?: boolean
-    status?: boolean
     totalCents?: boolean
-    createdAt?: boolean
     items?: boolean
     qty?: boolean
+    status?: boolean
+    createdAt?: boolean
+    userId?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["order"]>
 
   export type OrderSelectScalar = {
     id?: boolean
-    rfidTag?: boolean
-    status?: boolean
     totalCents?: boolean
-    createdAt?: boolean
     items?: boolean
     qty?: boolean
+    status?: boolean
+    createdAt?: boolean
+    userId?: boolean
   }
 
-  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "rfidTag" | "status" | "totalCents" | "createdAt" | "items" | "qty", ExtArgs["result"]["order"]>
+  export type OrderOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "totalCents" | "items" | "qty" | "status" | "createdAt" | "userId", ExtArgs["result"]["order"]>
+  export type OrderInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type OrderIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type OrderIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
 
   export type $OrderPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Order"
-    objects: {}
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: number
-      rfidTag: string
-      status: string
       totalCents: number
-      createdAt: Date
       items: string[]
       qty: number[]
+      status: string
+      createdAt: Date
+      userId: number
     }, ExtArgs["result"]["order"]>
     composites: {}
   }
@@ -3744,6 +3867,7 @@ export namespace Prisma {
    */
   export interface Prisma__OrderClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3774,12 +3898,12 @@ export namespace Prisma {
    */
   interface OrderFieldRefs {
     readonly id: FieldRef<"Order", 'Int'>
-    readonly rfidTag: FieldRef<"Order", 'String'>
-    readonly status: FieldRef<"Order", 'String'>
     readonly totalCents: FieldRef<"Order", 'Int'>
-    readonly createdAt: FieldRef<"Order", 'DateTime'>
     readonly items: FieldRef<"Order", 'String[]'>
     readonly qty: FieldRef<"Order", 'Int[]'>
+    readonly status: FieldRef<"Order", 'String'>
+    readonly createdAt: FieldRef<"Order", 'DateTime'>
+    readonly userId: FieldRef<"Order", 'Int'>
   }
     
 
@@ -3796,6 +3920,10 @@ export namespace Prisma {
      * Omit specific fields from the Order
      */
     omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
     /**
      * Filter, which Order to fetch.
      */
@@ -3815,6 +3943,10 @@ export namespace Prisma {
      */
     omit?: OrderOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    /**
      * Filter, which Order to fetch.
      */
     where: OrderWhereUniqueInput
@@ -3832,6 +3964,10 @@ export namespace Prisma {
      * Omit specific fields from the Order
      */
     omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
     /**
      * Filter, which Order to fetch.
      */
@@ -3881,6 +4017,10 @@ export namespace Prisma {
      */
     omit?: OrderOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    /**
      * Filter, which Order to fetch.
      */
     where?: OrderWhereInput
@@ -3929,6 +4069,10 @@ export namespace Prisma {
      */
     omit?: OrderOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    /**
      * Filter, which Orders to fetch.
      */
     where?: OrderWhereInput
@@ -3972,6 +4116,10 @@ export namespace Prisma {
      */
     omit?: OrderOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
+    /**
      * The data needed to create a Order.
      */
     data: XOR<OrderCreateInput, OrderUncheckedCreateInput>
@@ -4005,6 +4153,10 @@ export namespace Prisma {
      */
     data: OrderCreateManyInput | OrderCreateManyInput[]
     skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderIncludeCreateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -4019,6 +4171,10 @@ export namespace Prisma {
      * Omit specific fields from the Order
      */
     omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
     /**
      * The data needed to update a Order.
      */
@@ -4071,6 +4227,10 @@ export namespace Prisma {
      * Limit how many Orders to update.
      */
     limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderIncludeUpdateManyAndReturn<ExtArgs> | null
   }
 
   /**
@@ -4085,6 +4245,10 @@ export namespace Prisma {
      * Omit specific fields from the Order
      */
     omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
     /**
      * The filter to search for the Order to update in case it exists.
      */
@@ -4111,6 +4275,10 @@ export namespace Prisma {
      * Omit specific fields from the Order
      */
     omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
     /**
      * Filter which Order to delete.
      */
@@ -4143,6 +4311,10 @@ export namespace Prisma {
      * Omit specific fields from the Order
      */
     omit?: OrderOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: OrderInclude<ExtArgs> | null
   }
 
 
@@ -4182,12 +4354,12 @@ export namespace Prisma {
 
   export const OrderScalarFieldEnum: {
     id: 'id',
-    rfidTag: 'rfidTag',
-    status: 'status',
     totalCents: 'totalCents',
-    createdAt: 'createdAt',
     items: 'items',
-    qty: 'qty'
+    qty: 'qty',
+    status: 'status',
+    createdAt: 'createdAt',
+    userId: 'userId'
   };
 
   export type OrderScalarFieldEnum = (typeof OrderScalarFieldEnum)[keyof typeof OrderScalarFieldEnum]
@@ -4289,6 +4461,7 @@ export namespace Prisma {
     email?: StringFilter<"User"> | string
     name?: StringNullableFilter<"User"> | string | null
     rfidTag?: StringNullableFilter<"User"> | string | null
+    orders?: OrderListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -4296,6 +4469,7 @@ export namespace Prisma {
     email?: SortOrder
     name?: SortOrderInput | SortOrder
     rfidTag?: SortOrderInput | SortOrder
+    orders?: OrderOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -4306,6 +4480,7 @@ export namespace Prisma {
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
     name?: StringNullableFilter<"User"> | string | null
+    orders?: OrderListRelationFilter
   }, "id" | "email" | "rfidTag">
 
   export type UserOrderByWithAggregationInput = {
@@ -4384,22 +4559,24 @@ export namespace Prisma {
     OR?: OrderWhereInput[]
     NOT?: OrderWhereInput | OrderWhereInput[]
     id?: IntFilter<"Order"> | number
-    rfidTag?: StringFilter<"Order"> | string
-    status?: StringFilter<"Order"> | string
     totalCents?: IntFilter<"Order"> | number
-    createdAt?: DateTimeFilter<"Order"> | Date | string
     items?: StringNullableListFilter<"Order">
     qty?: IntNullableListFilter<"Order">
+    status?: StringFilter<"Order"> | string
+    createdAt?: DateTimeFilter<"Order"> | Date | string
+    userId?: IntFilter<"Order"> | number
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type OrderOrderByWithRelationInput = {
     id?: SortOrder
-    rfidTag?: SortOrder
-    status?: SortOrder
     totalCents?: SortOrder
-    createdAt?: SortOrder
     items?: SortOrder
     qty?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
+    user?: UserOrderByWithRelationInput
   }
 
   export type OrderWhereUniqueInput = Prisma.AtLeast<{
@@ -4407,22 +4584,23 @@ export namespace Prisma {
     AND?: OrderWhereInput | OrderWhereInput[]
     OR?: OrderWhereInput[]
     NOT?: OrderWhereInput | OrderWhereInput[]
-    rfidTag?: StringFilter<"Order"> | string
-    status?: StringFilter<"Order"> | string
     totalCents?: IntFilter<"Order"> | number
-    createdAt?: DateTimeFilter<"Order"> | Date | string
     items?: StringNullableListFilter<"Order">
     qty?: IntNullableListFilter<"Order">
+    status?: StringFilter<"Order"> | string
+    createdAt?: DateTimeFilter<"Order"> | Date | string
+    userId?: IntFilter<"Order"> | number
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
   export type OrderOrderByWithAggregationInput = {
     id?: SortOrder
-    rfidTag?: SortOrder
-    status?: SortOrder
     totalCents?: SortOrder
-    createdAt?: SortOrder
     items?: SortOrder
     qty?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
     _count?: OrderCountOrderByAggregateInput
     _avg?: OrderAvgOrderByAggregateInput
     _max?: OrderMaxOrderByAggregateInput
@@ -4435,18 +4613,19 @@ export namespace Prisma {
     OR?: OrderScalarWhereWithAggregatesInput[]
     NOT?: OrderScalarWhereWithAggregatesInput | OrderScalarWhereWithAggregatesInput[]
     id?: IntWithAggregatesFilter<"Order"> | number
-    rfidTag?: StringWithAggregatesFilter<"Order"> | string
-    status?: StringWithAggregatesFilter<"Order"> | string
     totalCents?: IntWithAggregatesFilter<"Order"> | number
-    createdAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
     items?: StringNullableListFilter<"Order">
     qty?: IntNullableListFilter<"Order">
+    status?: StringWithAggregatesFilter<"Order"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"Order"> | Date | string
+    userId?: IntWithAggregatesFilter<"Order"> | number
   }
 
   export type UserCreateInput = {
     email: string
     name?: string | null
     rfidTag?: string | null
+    orders?: OrderCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -4454,12 +4633,14 @@ export namespace Prisma {
     email: string
     name?: string | null
     rfidTag?: string | null
+    orders?: OrderUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     rfidTag?: NullableStringFieldUpdateOperationsInput | string | null
+    orders?: OrderUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -4467,6 +4648,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     name?: NullableStringFieldUpdateOperationsInput | string | null
     rfidTag?: NullableStringFieldUpdateOperationsInput | string | null
+    orders?: OrderUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -4536,70 +4718,69 @@ export namespace Prisma {
   }
 
   export type OrderCreateInput = {
-    rfidTag: string
-    status?: string
     totalCents: number
-    createdAt?: Date | string
     items?: OrderCreateitemsInput | string[]
     qty?: OrderCreateqtyInput | number[]
+    status: string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutOrdersInput
   }
 
   export type OrderUncheckedCreateInput = {
     id?: number
-    rfidTag: string
-    status?: string
     totalCents: number
-    createdAt?: Date | string
     items?: OrderCreateitemsInput | string[]
     qty?: OrderCreateqtyInput | number[]
+    status: string
+    createdAt?: Date | string
+    userId: number
   }
 
   export type OrderUpdateInput = {
-    rfidTag?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
     totalCents?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderUpdateitemsInput | string[]
     qty?: OrderUpdateqtyInput | number[]
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutOrdersNestedInput
   }
 
   export type OrderUncheckedUpdateInput = {
     id?: IntFieldUpdateOperationsInput | number
-    rfidTag?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
     totalCents?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderUpdateitemsInput | string[]
     qty?: OrderUpdateqtyInput | number[]
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: IntFieldUpdateOperationsInput | number
   }
 
   export type OrderCreateManyInput = {
     id?: number
-    rfidTag: string
-    status?: string
     totalCents: number
-    createdAt?: Date | string
     items?: OrderCreateitemsInput | string[]
     qty?: OrderCreateqtyInput | number[]
+    status: string
+    createdAt?: Date | string
+    userId: number
   }
 
   export type OrderUpdateManyMutationInput = {
-    rfidTag?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
     totalCents?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderUpdateitemsInput | string[]
     qty?: OrderUpdateqtyInput | number[]
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type OrderUncheckedUpdateManyInput = {
     id?: IntFieldUpdateOperationsInput | number
-    rfidTag?: StringFieldUpdateOperationsInput | string
-    status?: StringFieldUpdateOperationsInput | string
     totalCents?: IntFieldUpdateOperationsInput | number
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: OrderUpdateitemsInput | string[]
     qty?: OrderUpdateqtyInput | number[]
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    userId?: IntFieldUpdateOperationsInput | number
   }
 
   export type IntFilter<$PrismaModel = never> = {
@@ -4643,9 +4824,19 @@ export namespace Prisma {
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
+  export type OrderListRelationFilter = {
+    every?: OrderWhereInput
+    some?: OrderWhereInput
+    none?: OrderWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
+  }
+
+  export type OrderOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type UserCountOrderByAggregateInput = {
@@ -4762,17 +4953,6 @@ export namespace Prisma {
     stock?: SortOrder
   }
 
-  export type DateTimeFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
-  }
-
   export type StringNullableListFilter<$PrismaModel = never> = {
     equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
     has?: string | StringFieldRefInput<$PrismaModel> | null
@@ -4789,42 +4969,60 @@ export namespace Prisma {
     isEmpty?: boolean
   }
 
+  export type DateTimeFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
   export type OrderCountOrderByAggregateInput = {
     id?: SortOrder
-    rfidTag?: SortOrder
-    status?: SortOrder
     totalCents?: SortOrder
-    createdAt?: SortOrder
     items?: SortOrder
     qty?: SortOrder
+    status?: SortOrder
+    createdAt?: SortOrder
+    userId?: SortOrder
   }
 
   export type OrderAvgOrderByAggregateInput = {
     id?: SortOrder
     totalCents?: SortOrder
     qty?: SortOrder
+    userId?: SortOrder
   }
 
   export type OrderMaxOrderByAggregateInput = {
     id?: SortOrder
-    rfidTag?: SortOrder
-    status?: SortOrder
     totalCents?: SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
+    userId?: SortOrder
   }
 
   export type OrderMinOrderByAggregateInput = {
     id?: SortOrder
-    rfidTag?: SortOrder
-    status?: SortOrder
     totalCents?: SortOrder
+    status?: SortOrder
     createdAt?: SortOrder
+    userId?: SortOrder
   }
 
   export type OrderSumOrderByAggregateInput = {
     id?: SortOrder
     totalCents?: SortOrder
     qty?: SortOrder
+    userId?: SortOrder
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -4841,12 +5039,40 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type OrderCreateNestedManyWithoutUserInput = {
+    create?: XOR<OrderCreateWithoutUserInput, OrderUncheckedCreateWithoutUserInput> | OrderCreateWithoutUserInput[] | OrderUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutUserInput | OrderCreateOrConnectWithoutUserInput[]
+    createMany?: OrderCreateManyUserInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+  }
+
+  export type OrderUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<OrderCreateWithoutUserInput, OrderUncheckedCreateWithoutUserInput> | OrderCreateWithoutUserInput[] | OrderUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutUserInput | OrderCreateOrConnectWithoutUserInput[]
+    createMany?: OrderCreateManyUserInputEnvelope
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
 
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
+  }
+
+  export type OrderUpdateManyWithoutUserNestedInput = {
+    create?: XOR<OrderCreateWithoutUserInput, OrderUncheckedCreateWithoutUserInput> | OrderCreateWithoutUserInput[] | OrderUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutUserInput | OrderCreateOrConnectWithoutUserInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutUserInput | OrderUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: OrderCreateManyUserInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutUserInput | OrderUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutUserInput | OrderUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
   }
 
   export type IntFieldUpdateOperationsInput = {
@@ -4857,6 +5083,20 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type OrderUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<OrderCreateWithoutUserInput, OrderUncheckedCreateWithoutUserInput> | OrderCreateWithoutUserInput[] | OrderUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: OrderCreateOrConnectWithoutUserInput | OrderCreateOrConnectWithoutUserInput[]
+    upsert?: OrderUpsertWithWhereUniqueWithoutUserInput | OrderUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: OrderCreateManyUserInputEnvelope
+    set?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    disconnect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    delete?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    connect?: OrderWhereUniqueInput | OrderWhereUniqueInput[]
+    update?: OrderUpdateWithWhereUniqueWithoutUserInput | OrderUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: OrderUpdateManyWithWhereWithoutUserInput | OrderUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: OrderScalarWhereInput | OrderScalarWhereInput[]
+  }
+
   export type OrderCreateitemsInput = {
     set: string[]
   }
@@ -4865,8 +5105,10 @@ export namespace Prisma {
     set: number[]
   }
 
-  export type DateTimeFieldUpdateOperationsInput = {
-    set?: Date | string
+  export type UserCreateNestedOneWithoutOrdersInput = {
+    create?: XOR<UserCreateWithoutOrdersInput, UserUncheckedCreateWithoutOrdersInput>
+    connectOrCreate?: UserCreateOrConnectWithoutOrdersInput
+    connect?: UserWhereUniqueInput
   }
 
   export type OrderUpdateitemsInput = {
@@ -4877,6 +5119,18 @@ export namespace Prisma {
   export type OrderUpdateqtyInput = {
     set?: number[]
     push?: number | number[]
+  }
+
+  export type DateTimeFieldUpdateOperationsInput = {
+    set?: Date | string
+  }
+
+  export type UserUpdateOneRequiredWithoutOrdersNestedInput = {
+    create?: XOR<UserCreateWithoutOrdersInput, UserUncheckedCreateWithoutOrdersInput>
+    connectOrCreate?: UserCreateOrConnectWithoutOrdersInput
+    upsert?: UserUpsertWithoutOrdersInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutOrdersInput, UserUpdateWithoutOrdersInput>, UserUncheckedUpdateWithoutOrdersInput>
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -5013,6 +5267,139 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type OrderCreateWithoutUserInput = {
+    totalCents: number
+    items?: OrderCreateitemsInput | string[]
+    qty?: OrderCreateqtyInput | number[]
+    status: string
+    createdAt?: Date | string
+  }
+
+  export type OrderUncheckedCreateWithoutUserInput = {
+    id?: number
+    totalCents: number
+    items?: OrderCreateitemsInput | string[]
+    qty?: OrderCreateqtyInput | number[]
+    status: string
+    createdAt?: Date | string
+  }
+
+  export type OrderCreateOrConnectWithoutUserInput = {
+    where: OrderWhereUniqueInput
+    create: XOR<OrderCreateWithoutUserInput, OrderUncheckedCreateWithoutUserInput>
+  }
+
+  export type OrderCreateManyUserInputEnvelope = {
+    data: OrderCreateManyUserInput | OrderCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type OrderUpsertWithWhereUniqueWithoutUserInput = {
+    where: OrderWhereUniqueInput
+    update: XOR<OrderUpdateWithoutUserInput, OrderUncheckedUpdateWithoutUserInput>
+    create: XOR<OrderCreateWithoutUserInput, OrderUncheckedCreateWithoutUserInput>
+  }
+
+  export type OrderUpdateWithWhereUniqueWithoutUserInput = {
+    where: OrderWhereUniqueInput
+    data: XOR<OrderUpdateWithoutUserInput, OrderUncheckedUpdateWithoutUserInput>
+  }
+
+  export type OrderUpdateManyWithWhereWithoutUserInput = {
+    where: OrderScalarWhereInput
+    data: XOR<OrderUpdateManyMutationInput, OrderUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type OrderScalarWhereInput = {
+    AND?: OrderScalarWhereInput | OrderScalarWhereInput[]
+    OR?: OrderScalarWhereInput[]
+    NOT?: OrderScalarWhereInput | OrderScalarWhereInput[]
+    id?: IntFilter<"Order"> | number
+    totalCents?: IntFilter<"Order"> | number
+    items?: StringNullableListFilter<"Order">
+    qty?: IntNullableListFilter<"Order">
+    status?: StringFilter<"Order"> | string
+    createdAt?: DateTimeFilter<"Order"> | Date | string
+    userId?: IntFilter<"Order"> | number
+  }
+
+  export type UserCreateWithoutOrdersInput = {
+    email: string
+    name?: string | null
+    rfidTag?: string | null
+  }
+
+  export type UserUncheckedCreateWithoutOrdersInput = {
+    id?: number
+    email: string
+    name?: string | null
+    rfidTag?: string | null
+  }
+
+  export type UserCreateOrConnectWithoutOrdersInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutOrdersInput, UserUncheckedCreateWithoutOrdersInput>
+  }
+
+  export type UserUpsertWithoutOrdersInput = {
+    update: XOR<UserUpdateWithoutOrdersInput, UserUncheckedUpdateWithoutOrdersInput>
+    create: XOR<UserCreateWithoutOrdersInput, UserUncheckedCreateWithoutOrdersInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutOrdersInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutOrdersInput, UserUncheckedUpdateWithoutOrdersInput>
+  }
+
+  export type UserUpdateWithoutOrdersInput = {
+    email?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    rfidTag?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type UserUncheckedUpdateWithoutOrdersInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    email?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    rfidTag?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type OrderCreateManyUserInput = {
+    id?: number
+    totalCents: number
+    items?: OrderCreateitemsInput | string[]
+    qty?: OrderCreateqtyInput | number[]
+    status: string
+    createdAt?: Date | string
+  }
+
+  export type OrderUpdateWithoutUserInput = {
+    totalCents?: IntFieldUpdateOperationsInput | number
+    items?: OrderUpdateitemsInput | string[]
+    qty?: OrderUpdateqtyInput | number[]
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderUncheckedUpdateWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    totalCents?: IntFieldUpdateOperationsInput | number
+    items?: OrderUpdateitemsInput | string[]
+    qty?: OrderUpdateqtyInput | number[]
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type OrderUncheckedUpdateManyWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    totalCents?: IntFieldUpdateOperationsInput | number
+    items?: OrderUpdateitemsInput | string[]
+    qty?: OrderUpdateqtyInput | number[]
+    status?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

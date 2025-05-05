@@ -116,16 +116,14 @@ export default function PlaceOrderPage() {
     // All validations passed, proceed with API request
     setLoading(true)
     try {
-      const res = await fetch("/api/place-order", {
+      const res = await fetch(`/api/place-order/${rfidTag}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          // Include RFID tag in headers as a backup
-          rfidTag: rfidTag,
         },
         body: JSON.stringify({
           items: orderItems,
-          rfidTag,
+          rfidNo: rfidTag, // Ensure rfidTag is passed as rfidNo
         }),
       })
 
