@@ -1,20 +1,23 @@
-// ESP32 RFID Reader with MQTT Integration
 #include <WiFi.h>
 #include <SPI.h>
 #include <MFRC522.h>
 #include <PubSubClient.h>
-// #include <LiquidCrystal.h>     // Uncomment if using LCD
+#include <Wire.h>
+#include <LiquidCrystal_I2C.h>  // Changed to I2C LCD library
 
-// ===== RFID Pins (SPI) =====
-#define SS_PIN   5     // GPIO5 for RFID SS
-#define RST_PIN  22    // GPIO22 for RFID RST
-MFRC522 rfid(SS_PIN, RST_PIN);
+// ========== RFID Setup ==========
+#define SS_PIN   5   // RFID SS
+#define RST_PIN  22  // RFID RST
+MFRC522 rfid(SS_PIN, RST_PIN); 
 
-// ===== LCD Pins (4‑bit mode) =====
-// LiquidCrystal lcd(2, 4, 16, 17, 18, 19);  
-//            RS, E, D4, D5, D6, D7
+// ========== LCD Setup ==========
+// For I2C LCD - using default I2C pins (SDA=21, SCL=22 on ESP32)
+// 0x27 is the default I2C address for most I2C LCD backpacks
+// If not working, you might need to use 0x3F or scan for the correct address
 
-// ===== Wi‑Fi & MQTT =====
+LiquidCrystal_I2C lcd(0x27, 16, 2);  // Set the LCD address to 0x27 for a 16 chars and 2 line display
+
+// ========== Wi-Fi and MQTT ==========
 const char* ssid = "oneplus_ayush";
 const char* password = "12345678";
 const char* mqtt_server = "192.168.46.183";
@@ -23,22 +26,27 @@ const uint16_t mqtt_port = 1883;
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
+// ========== Setup ==========
 void setup() {
   Serial.begin(9600);
-  Serial.println("Starting RFID reader...");
   
-  // --- Init LCD ---
-  // lcd.begin(16, 2);             
-  // lcd.print("RFID Init...");    // splash message
+  // Initialize I2C
+  Wire.begin(20, 21);  // SDA and SCL use default pins (21 and 22 on ESP32)
+  
+  // Initialize the LCD
+  lcd.init();
+  lcd.backlight();
+  lcd.print("Starting...");
 
-  // --- Init SPI & RFID ---
-  SPI.begin(18, 19, 23, SS_PIN); // SCK, MISO, MOSI, SS
-  rfid.PCD_Init();               // init RFID reader
+  // SPI for RFID
+  SPI.begin(18, 19, 23, SS_PIN);  // SCK, MISO, MOSI, SS
+  rfid.PCD_Init();
   Serial.println("RFID initialized");
 
-  // --- Connect WiFi ---
-  Serial.print("Connecting to WiFi");
+  // Wi-Fi
   WiFi.begin(ssid, password);
+  lcd.clear();
+  lcd.print("Connecting WiFi");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
     Serial.print(".");
@@ -46,24 +54,25 @@ void setup() {
   Serial.println("\nWiFi connected");
   Serial.print("IP address: ");
   Serial.println(WiFi.localIP());
-  
-  // lcd.clear();
-  // lcd.print("WiFi Connected");
+  lcd.clear();
+  lcd.print("WiFi Connected");
 
-  // --- Setup MQTT ---
+  // MQTT
   mqttClient.setServer(mqtt_server, mqtt_port);
+  mqttClient.setCallback(mqttCallback);
   connectMQTT();
-  
-  // lcd.clear();
-  // lcd.print("Ready to scan");
-  Serial.println("Ready to scan RFID cards");
+
+  lcd.clear();
+  lcd.print("Ready to scan");
 }
 
+// ========== MQTT Reconnect ==========
 void connectMQTT() {
-  Serial.print("Connecting to MQTT broker...");
   while (!mqttClient.connected()) {
+    Serial.print("Connecting to MQTT...");
     if (mqttClient.connect("ESP32RFIDClient")) {
-      // mqttClient.publish("rfid/status", "online");
+      mqttClient.publish("rfid/status", "ESP32 online");
+      mqttClient.subscribe("rfid/dispensed");
       Serial.println("connected");
     } else {
       Serial.print(".");
@@ -72,30 +81,73 @@ void connectMQTT() {
   }
 }
 
+// ========== MQTT Message Handling ==========
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  String message;
+  for (unsigned int i = 0; i < length; i++) {
+    message += (char)payload[i];
+  }
+
+  Serial.print("Message from [");
+  Serial.print(topic);
+  Serial.print("]: ");
+  Serial.println(message);
+
+  lcd.clear();
+  lcd.setCursor(0, 0);
+
+  if (message.startsWith("ITEM:")) {
+    lcd.print("Item Info:");
+    lcd.setCursor(0, 1);
+    lcd.print(message.substring(0, 16));
+  } else if (message.startsWith("DISPENSED:")) {
+    lcd.print("Order Dispensed:");
+    lcd.setCursor(0, 1);
+    lcd.print(message.substring(10, 26));
+  } else if (message == "ERROR") {
+    lcd.print("Error occurred!");
+    lcd.setCursor(0, 1);
+    lcd.print("Try again later");
+  } else if (message.startsWith("Hi, Sorry")) {
+    lcd.print("No orders found");
+    lcd.setCursor(0, 1);
+    lcd.print("Try again later");
+  } else {
+    lcd.print("Message:");
+    lcd.setCursor(0, 1);
+    lcd.print(message.substring(0, 16));
+  }
+}
+
+// ========== Main Loop ==========
 void loop() {
-  // Ensure MQTT connection is maintained
   if (!mqttClient.connected()) {
     connectMQTT();
   }
   mqttClient.loop();
 
-  // Check for RFID card
+  // RFID scan
   if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
     String uid = "";
     for (byte i = 0; i < rfid.uid.size; i++) {
-      uid += String(rfid.uid.uidByte[i] < 0x10 ? "0" : "");
+      if (rfid.uid.uidByte[i] < 0x10) uid += "0";
       uid += String(rfid.uid.uidByte[i], HEX);
     }
     uid.toUpperCase();
     Serial.println("UID: " + uid);
-    
-    // Publish to the topic that the Node.js script is subscribed to
+
     mqttClient.publish("rfid/status", uid.c_str());
-    
-    // lcd.clear();
-    // lcd.print("Card: " + uid);
-    
-    rfid.PICC_HaltA(); // Stop reading
-    delay(1000);       // Prevent multiple reads
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Card UID:");
+    lcd.setCursor(0, 1);
+    lcd.print(uid.substring(0, 16));
+
+    delay(1000);  // Show UID
+    lcd.clear();
+    lcd.print("Processing...");
+    rfid.PICC_HaltA();
+    delay(1000);
   }
 }

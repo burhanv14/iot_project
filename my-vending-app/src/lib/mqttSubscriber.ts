@@ -18,7 +18,15 @@ client.on('connect', () => {
 });
 
 client.on('message', async (topic: string, payload: Buffer) => {
-  const uid = payload.toString().toUpperCase();
+  const message = payload.toString();
+  
+  // Ignore the "ESP32 online" message
+  if (message === "ESP32 online") {
+    console.log('[MQTT] ESP32 reported online');
+    return;
+  }
+  
+  const uid = message.toUpperCase();
   console.log('[MQTT] Scanned UID:', uid);
 
   // Find latest order for this RFID
@@ -29,15 +37,15 @@ client.on('message', async (topic: string, payload: Buffer) => {
 
   if (!order) {
     console.log('[DISPENSE] No order found for', uid);
-    // Optionally publish back to the ESP32 that no order was found
-    // client.publish('rfid/response', 'ORDER_NOT_FOUND');
+    // Publish no orders message to the client
+    client.publish('rfid/dispensed', 'Hi, Sorry No orders');
     return;
   }
   
   if (order.status !== 'pending') {
     console.log('[DISPENSE] Order', order.id, 'already', order.status);
-    // Optionally publish back to the ESP32
-    // client.publish('rfid/response', `ORDER_${order.status.toUpperCase()}`);
+    // Publish no pending orders back to the ESP32
+    client.publish('rfid/dispensed', `Hi, Sorry No pending orders`);
     return;
   }
 
@@ -49,7 +57,7 @@ client.on('message', async (topic: string, payload: Buffer) => {
         data: { status: 'dispensed' },
       });
 
-      // Decrement each product's stock
+      // Decrement each product's stock and publish item details
       for (let i = 0; i < order.items.length; i++) {
         const productId = parseInt(order.items[i], 10);
         const qty = order.qty[i];
@@ -60,17 +68,25 @@ client.on('message', async (topic: string, payload: Buffer) => {
             stock: { decrement: qty }
           }
         });
+
+        // Send individual item info to ESP32 with slight delay
+        client.publish('rfid/dispensed', `ITEM:${productId},QTY:${qty}`);
+        
+        // Add small delay between messages to allow ESP32 to process each one
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     });
     
     console.log('[DISPENSE] Order', order.id, 'dispensed successfully');
-    // Publish success message back to ESP32
-    client.publish('rfid/response', `DISPENSED:${order.id}`);
+    // Wait a bit before sending the final success message
+    setTimeout(() => {
+      client.publish('rfid/dispensed', `DISPENSED:${order.id}`);
+    }, 1000);
     
   } catch (e) {
     console.error('[DISPENSE] Error:', (e as Error).message);
     // Publish error message back to ESP32
-    client.publish('rfid/response', 'ERROR');
+    client.publish('rfid/dispensed', 'ERROR');
   }
 });
 
