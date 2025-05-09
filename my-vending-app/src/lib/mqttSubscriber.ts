@@ -1,25 +1,23 @@
-// scripts/mqttSubscriber.ts
-import 'dotenv/config';
 import mqtt from 'mqtt';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
 // Use environment variable or fallback to the hardcoded value
-const MQTT_BROKER_URL = process.env.MQTT_BROKER_URL || 'mqtt://172.22.28.218:1883';
-const MQTT_TOPIC = 'rfid/scan';
+const MQTT_BROKER_URL = 'mqtt://192.168.46.183:1883';
+const MQTT_TOPIC = 'rfid/status';
 
 const client = mqtt.connect(MQTT_BROKER_URL);
 
 client.on('connect', () => {
   console.log('[MQTT] Connected to', MQTT_BROKER_URL);
-  client.subscribe(MQTT_TOPIC, err => {
+  client.subscribe(MQTT_TOPIC, (err: Error | null) => {
     if (err) console.error('[MQTT] Subscribe error:', err);
     else console.log(`[MQTT] Subscribed to ${MQTT_TOPIC}`);
   });
 });
 
-client.on('message', async (topic, payload) => {
+client.on('message', async (topic: string, payload: Buffer) => {
   const uid = payload.toString().toUpperCase();
   console.log('[MQTT] Scanned UID:', uid);
 
@@ -44,7 +42,7 @@ client.on('message', async (topic, payload) => {
   }
 
   try {
-    await prisma.$transaction(async tx => {
+    await prisma.$transaction(async (tx) => {
       // Mark order as dispensed
       await tx.order.update({
         where: { id: order.id },
@@ -81,7 +79,7 @@ client.on('close', () => {
   console.log('[MQTT] Connection closed. Attempting to reconnect...');
 });
 
-client.on('error', (error) => {
+client.on('error', (error: Error) => {
   console.error('[MQTT] Connection error:', error);
 });
 

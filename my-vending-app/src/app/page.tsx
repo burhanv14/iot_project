@@ -4,6 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { ShoppingCart, HelpCircle, Smartphone, CreditCard, Scan, ChevronRight } from "lucide-react"
+import vimg from "../../public/img.webp"
 
 export default function HomePage() {
   // Animation variants
@@ -119,7 +120,7 @@ export default function HomePage() {
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-200 to-teal-200 rounded-3xl transform rotate-3 scale-105 blur-xl opacity-30"></div>
                 <div className="relative bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100">
                   <Image
-                    src="/placeholder.svg?key=vuiao"
+                    src={vimg}
                     alt="IoT Vending Machine"
                     width={400}
                     height={600}

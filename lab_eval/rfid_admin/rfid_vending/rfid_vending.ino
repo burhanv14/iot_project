@@ -15,16 +15,16 @@ MFRC522 rfid(SS_PIN, RST_PIN);
 //            RS, E, D4, D5, D6, D7
 
 // ===== Wi‑Fi & MQTT =====
-const char* ssid = "SMB";
-const char* password = "BH1B127@#88";
-const char* mqtt_server = "172.22.28.218";
+const char* ssid = "oneplus_ayush";
+const char* password = "12345678";
+const char* mqtt_server = "192.168.46.183";
 const uint16_t mqtt_port = 1883;
 
 WiFiClient wifiClient;
 PubSubClient mqttClient(wifiClient);
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("Starting RFID reader...");
   
   // --- Init LCD ---
