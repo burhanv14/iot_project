@@ -63,7 +63,7 @@ void connectMQTT() {
   Serial.print("Connecting to MQTT broker...");
   while (!mqttClient.connected()) {
     if (mqttClient.connect("ESP32RFIDClient")) {
-      mqttClient.publish("rfid/status", "online");
+      // mqttClient.publish("rfid/status", "online");
       Serial.println("connected");
     } else {
       Serial.print(".");
@@ -90,7 +90,7 @@ void loop() {
     Serial.println("UID: " + uid);
     
     // Publish to the topic that the Node.js script is subscribed to
-    mqttClient.publish("rfid/scan", uid.c_str());
+    mqttClient.publish("rfid/status", uid.c_str());
     
     // lcd.clear();
     // lcd.print("Card: " + uid);
