@@ -32,7 +32,6 @@ void setup() {
   
   // Initialize I2C
   Wire.begin(20, 21);  // SDA and SCL use default pins (21 and 22 on ESP32)
-  
   // Initialize the LCD
   lcd.init();
   lcd.backlight();
@@ -96,14 +95,39 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
   lcd.clear();
   lcd.setCursor(0, 0);
 
-  if (message.startsWith("ITEM:")) {
-    lcd.print("Item Info:");
-    lcd.setCursor(0, 1);
-    lcd.print(message.substring(0, 16));
+  if (message.startsWith("ITEM:") || message.startsWith("NAME:")) {
+    // Parse product info and quantity
+    String prefix = message.startsWith("ITEM:") ? "ITEM:" : "NAME:";
+    int prefixLen = prefix.length();
+    int infoEndPos = message.indexOf(",QTY:");
+    int qtyStartPos = infoEndPos + 5;  // Position after ",QTY:"
+    
+    if (infoEndPos > 0) {
+      String productInfo = message.substring(prefixLen, infoEndPos);
+      String quantity = message.substring(qtyStartPos);
+      
+      // Display product info and quantity in a user-friendly format
+      if (message.startsWith("ITEM:")) {
+        lcd.print("Product ID: " + productInfo);
+      } else {
+        // For NAME: messages, display the product name
+        lcd.print(productInfo);
+      }
+      
+      lcd.setCursor(0, 1);
+      lcd.print("Quantity: " + quantity);
+      
+      Serial.println("Parsed - Product: " + productInfo + ", Quantity: " + quantity);
+    } else {
+      // Fallback if parsing fails
+      lcd.print("Item Info:");
+      lcd.setCursor(0, 1);
+      lcd.print(message.substring(0, 16));
+    }
   } else if (message.startsWith("DISPENSED:")) {
-    lcd.print("Order Dispensed:");
+    lcd.print("Order Dispensed!");
     lcd.setCursor(0, 1);
-    lcd.print(message.substring(10, 26));
+    lcd.print("Order #" + message.substring(10, 16));
   } else if (message == "ERROR") {
     lcd.print("Error occurred!");
     lcd.setCursor(0, 1);
@@ -116,6 +140,14 @@ void mqttCallback(char* topic, byte* payload, unsigned int length) {
     lcd.print("Message:");
     lcd.setCursor(0, 1);
     lcd.print(message.substring(0, 16));
+  }
+  
+  // Automatically clear the LCD after 3 seconds and go back to "Ready to scan"
+  // for non-error messages
+  if (!message.startsWith("ERROR") && !message.startsWith("Hi, Sorry")) {
+    delay(3000);
+    lcd.clear();
+    lcd.print("Ready to scan");
   }
 }
 

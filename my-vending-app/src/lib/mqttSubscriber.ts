@@ -26,30 +26,89 @@ client.on('message', async (topic: string, payload: Buffer) => {
     return;
   }
   
-  const uid = message.toUpperCase();
+  let uid = message.toUpperCase();
   console.log('[MQTT] Scanned UID:', uid);
-
-  // Find latest order for this RFID
-  const order = await prisma.order.findFirst({
-    where: { user: { rfidTag: uid } },
-    orderBy: { createdAt: 'desc' },
-  });
-
-  if (!order) {
-    console.log('[DISPENSE] No order found for', uid);
-    // Publish no orders message to the client
-    client.publish('rfid/dispensed', 'Hi, Sorry No orders');
-    return;
-  }
   
-  if (order.status !== 'pending') {
-    console.log('[DISPENSE] Order', order.id, 'already', order.status);
-    // Publish no pending orders back to the ESP32
-    client.publish('rfid/dispensed', `Hi, Sorry No pending orders`);
-    return;
+  // Format the UID to match the database format (with colons)
+  // Convert "3CA0D500" to "3C:A0:D5:00"
+  if (uid.length === 8) {
+    uid = `${uid.slice(0, 2)}:${uid.slice(2, 4)}:${uid.slice(4, 6)}:${uid.slice(6, 8)}`;
+  } else if (uid.length === 14) {
+    // If it's a longer UID like "DF36931C12345", format as "DF:36:93:1C:12:34:5"
+    uid = uid.match(/.{1,2}/g)?.join(':') || uid;
   }
+  console.log('[MQTT] Formatted UID for database lookup:', uid);
 
   try {
+    // First, find the user with this RFID tag
+    const user = await prisma.user.findUnique({
+      where: {
+        rfidTag: uid
+      }
+    });
+
+    if (!user) {
+      console.log('[DISPENSE] No user found for RFID:', uid);
+      client.publish('rfid/dispensed', 'Hi, Sorry No user found');
+      return;
+    }
+
+    // Then find the latest pending order for this user
+    const order = await prisma.order.findFirst({
+      where: { 
+        userId: user.id,
+        status: 'pending'
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!order) {
+      console.log('[DISPENSE] No pending order found for user:', user.id);
+      client.publish('rfid/dispensed', 'Hi, Sorry No pending orders');
+      return;
+    }
+    
+    // Log the order structure to understand the data format
+    console.log('[DISPENSE] Found order:', JSON.stringify(order, null, 2));
+    
+    // Validate items and qty arrays
+    if (!Array.isArray(order.items) || !Array.isArray(order.qty)) {
+      console.error('[DISPENSE] Order has invalid items or qty format:', { 
+        itemsType: typeof order.items, 
+        qtyType: typeof order.qty 
+      });
+      
+      // Try to parse JSON strings if needed
+      if (typeof order.items === 'string') {
+        try {
+          order.items = JSON.parse(order.items);
+          console.log('[DISPENSE] Successfully parsed items from JSON string');
+        } catch (e) {
+          console.error('[DISPENSE] Failed to parse items JSON:', e);
+          client.publish('rfid/dispensed', 'Error: Invalid order format');
+          return;
+        }
+      }
+      
+      if (typeof order.qty === 'string') {
+        try {
+          order.qty = JSON.parse(order.qty);
+          console.log('[DISPENSE] Successfully parsed qty from JSON string');
+        } catch (e) {
+          console.error('[DISPENSE] Failed to parse qty JSON:', e);
+          client.publish('rfid/dispensed', 'Error: Invalid order format');
+          return;
+        }
+      }
+      
+      // If still not arrays after parsing attempts, return error
+      if (!Array.isArray(order.items) || !Array.isArray(order.qty)) {
+        console.error('[DISPENSE] Order items/qty could not be converted to arrays');
+        client.publish('rfid/dispensed', 'Error: Invalid order format');
+        return;
+      }
+    }
+    
     await prisma.$transaction(async (tx) => {
       // Mark order as dispensed
       await tx.order.update({
@@ -57,23 +116,35 @@ client.on('message', async (topic: string, payload: Buffer) => {
         data: { status: 'dispensed' },
       });
 
+      console.log('[DISPENSE] Order items:', order.items);
+      console.log('[DISPENSE] Order quantities:', order.qty);
+
       // Decrement each product's stock and publish item details
       for (let i = 0; i < order.items.length; i++) {
-        const productId = parseInt(order.items[i], 10);
-        const qty = order.qty[i];
-        
-        await tx.product.update({
-          where: { id: productId },
-          data: { 
-            stock: { decrement: qty }
+        try {
+          let productInfo = order.items[i];
+          const qty = order.qty[i];
+          
+          // Handle both numeric IDs and string product names
+          if (typeof productInfo === 'number') {
+            console.log(`[DISPENSE] Processing product ID: ${productInfo}, Quantity: ${qty}`);
+            // For numeric IDs, send just the ID
+            client.publish('rfid/dispensed', `ITEM:${productInfo},QTY:${qty}`);
+          } else if (typeof productInfo === 'string') {
+            // For string product names, send the name (truncated if needed)
+            const productName = productInfo.substring(0, 10); // Truncate to fit LCD if needed
+            console.log(`[DISPENSE] Processing product name: ${productName}, Quantity: ${qty}`);
+            client.publish('rfid/dispensed', `NAME:${productName},QTY:${qty}`);
+          } else {
+            console.error(`[DISPENSE] Unexpected product info type at index ${i}:`, typeof productInfo);
+            continue; // Skip this item
           }
-        });
-
-        // Send individual item info to ESP32 with slight delay
-        client.publish('rfid/dispensed', `ITEM:${productId},QTY:${qty}`);
-        
-        // Add small delay between messages to allow ESP32 to process each one
-        await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Add small delay between messages to allow ESP32 to process each one
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (error) {
+          console.error(`[DISPENSE] Error processing item at index ${i}:`, error);
+        }
       }
     });
     

@@ -5,11 +5,11 @@
 
 // —— USER CONFIGURATION ——
 // Your Wi‑Fi credentials:
-const char* SSID     = "SMB";
-const char* PASSWORD = "BH1B127@#88";
+const char* SSID     = "oneplus_ayush";
+const char* PASSWORD = "12345678";
 
 // Your MQTT broker’s IP (on your LAN) and port:
-const char* MQTT_SERVER = "172.22.28.218";   // ← removed leading space
+const char* MQTT_SERVER = "192.168.46.183";   // ← removed leading space
 const uint16_t MQTT_PORT = 1883;
 
 // MQTT topic to publish card UIDs to:
@@ -33,9 +33,9 @@ void setup() {
   delay(100);
 
   // 1) Init SPI bus
-  // SPI.begin(SCK_PIN, MISO_PIN, MOSI_PIN, SS_PIN);
-  // mfrc522.PCD_Init();
-  // Serial.println("✅ RC522 RFID reader initialized");
+  SPI.begin(SCK_PIN, MISO_PIN, MOSI_PIN, SS_PIN);
+  mfrc522.PCD_Init();
+  Serial.println("✅ RC522 RFID reader initialized");
 
   // 2) Connect to Wi‑Fi
   Serial.printf("🌐 Connecting to Wi-Fi SSID '%s'…", SSID);
